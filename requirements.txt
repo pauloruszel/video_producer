@@ -1,0 +1,4 @@
+opencv-python==4.11.0.86
+confluent-kafka==2.3.0
+onvif-zeep==0.2.12
+six>=1.16.0
