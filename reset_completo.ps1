@@ -1,5 +1,10 @@
 # Ativa o ambiente virtual
 Write-Host "`n--- Ativando ambiente virtual..."
+if (-Not (Test-Path ".\.venv\Scripts\Activate.ps1")) {
+    Write-Host "`n--- Ambiente virtual não encontrado. Criando..."
+    python -m venv .venv
+}
+
 . .\.venv\Scripts\Activate.ps1
 
 # Para e remove containers, volumes e rede
