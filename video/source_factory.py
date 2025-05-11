@@ -1,7 +1,9 @@
 import cv2
 import os
+import logging
 from .onvif_utils import get_rtsp_from_onvif
 
+logger = logging.getLogger(__name__)
 
 def open_video_source(source_type="auto", source_path=None, onvif_config=None):
     """
@@ -12,13 +14,14 @@ def open_video_source(source_type="auto", source_path=None, onvif_config=None):
     - "auto": tenta ONVIF se ativado, senão webcam
     """
     if source_type == "video":
+        logger.info(f"[Fonte] Usando vídeo local: {source_path}")
         return cv2.VideoCapture(source_path)
 
     if source_type == "webcam":
-        print("[Fonte] Usando webcam local (cv2.VideoCapture(0))")
+        logger.info("[Fonte] Usando webcam local (cv2.VideoCapture(0))")
         return cv2.VideoCapture(0)
 
-    if source_type == "onvif" or source_type == "auto":
+    if source_type in ["onvif", "auto"]:
         use_onvif = os.getenv("USE_ONVIF", "false").strip().lower() == "true"
 
         if use_onvif and onvif_config:
@@ -29,12 +32,12 @@ def open_video_source(source_type="auto", source_path=None, onvif_config=None):
                     onvif_config['user'],
                     onvif_config['password']
                 )
-                print(f"[ONVIF] Conectando via RTSP: {rtsp_url}")
+                logger.info(f"[ONVIF] Conectando via RTSP: {rtsp_url}")
                 return cv2.VideoCapture(rtsp_url)
             except Exception as e:
-                print(f"[FALHA ONVIF] {e}")
-                print("[Fallback] ONVIF falhou. Usando webcam.")
+                logger.warning(f"[FALHA ONVIF] {e}")
+                logger.info("[Fallback] ONVIF falhou. Usando webcam.")
                 return cv2.VideoCapture(0)
 
-    # fallback final
+    logger.info("[Fallback] Fonte padrão: webcam")
     return cv2.VideoCapture(0)

@@ -1,4 +1,7 @@
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_rtsp_from_onvif(ip, port, user, password):
     """
@@ -13,13 +16,13 @@ def get_rtsp_from_onvif(ip, port, user, password):
     use_onvif = os.getenv("USE_ONVIF", "false").strip().lower() == "true"
 
     if not use_onvif:
-        print("[MOCK] ONVIF desativado. Usando vídeo simulado.")
+        logger.warning("[MOCK] ONVIF desativado. Usando vídeo simulado.")
         return "video.mp4"  # caminho local para vídeo de teste
 
     try:
         from onvif import ONVIFCamera
 
-        print(f"[ONVIF] Conectando à câmera ONVIF em {ip}:{port}...")
+        logger.info(f"[ONVIF] Conectando à câmera ONVIF em {ip}:{port}...")
         cam = ONVIFCamera(ip, port, user, password)
 
         media_service = cam.create_media_service()
@@ -34,10 +37,10 @@ def get_rtsp_from_onvif(ip, port, user, password):
             'ProfileToken': profile.token
         })
 
-        print(f"[ONVIF] RTSP obtido com sucesso: {stream_uri.Uri}")
+        logger.info(f"[ONVIF] RTSP obtido com sucesso: {stream_uri.Uri}")
         return stream_uri.Uri
 
     except Exception as e:
-        print(f"[ERRO] Falha ao obter RTSP via ONVIF: {e}")
-        print("[FALLBACK] Usando vídeo local simulado.")
+        logger.error(f"[ERRO] Falha ao obter RTSP via ONVIF: {e}")
+        logger.warning("[FALLBACK] Usando vídeo local simulado.")
         return "video.mp4"

@@ -1,7 +1,9 @@
 import os
 from video.source_factory import open_video_source
 from kafka_client.producer_service import FrameProducerService
+from config.logging_config import configurar_logging
 
+configurar_logging()
 
 if __name__ == "__main__":
     print("[DEBUG] Variáveis de ambiente:")
